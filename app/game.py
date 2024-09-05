@@ -9,13 +9,14 @@ class Game():
         self.my_font = pygame.font.SysFont('arial', 20)
         self.size = [800, 600]
         self.screen = pygame.display.set_mode(self.size)
+        pygame.display.set_caption('Fractals')
         self.clock = pygame.time.Clock()
         self.angle = - math.pi / 2
         self.angle_speed = 0.1
         self.lenght = 100
         self.change_len = 1.5
         self.slider = Slider(
-            self.size[0] // 4, self.size[1] // 100, self.size[0] // 2, self.angle_speed, 1)
+            self.size[0] // 4, self.size[1] // 100, self.size[0] // 2, self.angle_speed, 2, 0)
         self.drag = False
 
     def fractal(
@@ -90,25 +91,26 @@ class Slider():
             y: int,
             length: int,
             value: float,
-            max_value: float = 1000
+            max_value: float = 1000,
+            min_value: float = 0.0,
     ) -> None:
         self.x = x
         self.y = y
         self.length = length
         self.value = value
         self.max_value = max_value
-        self.min_value = 0
+        self.min_value = min_value
 
     def draw(self, window: pygame.display) -> None:
         pygame.draw.aaline(window, (0, 0, 0), (self.x, self.y),
                            (self.x + self.length, self.y))
-        pygame.draw.circle(window, (0, 0, 0), (self.x + (self.length /
-                           (self.max_value / self.value) if self.value != 0 else 0), self.y), 10)
+        pygame.draw.circle(window, (0, 0, 0), (self.x + self.length /
+                           (self.max_value - self.min_value) * (self.value - self.min_value), self.y), 10)
         return
 
     def set_value_by_mouse_x(self, mouse_pos_x: int) -> float:
         value = max(0, min(mouse_pos_x - self.x, self.length)) / \
-            self.length * self.max_value
+            self.length * (self.max_value - self.min_value) + self.min_value
         self.value = min(max(value, self.min_value), self.max_value)
         return self.value
     
